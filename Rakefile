@@ -29,6 +29,9 @@ spec = Gem::Specification.new do |s|
   s.bindir       = "bin"
   s.executables  = %w( opscode-agent )
   
+  s.add_dependency 'rack', '>= 1.0.0'
+  s.add_dependency 'thin', '>= 1.2'
+  s.add_dependency 'nanite'
   
   s.require_path = 'lib'
   s.autorequire = GEM
