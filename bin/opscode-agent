@@ -31,8 +31,9 @@ require 'opscode/agent/cli'
 require 'opscode/agent/http_service'
 
 EM.run do
-  AMQP.logging = true
   agent = Opscode::Agent::CLI.new
+  AMQP.logging = agent.config[:log_amqp]
+  puts AMQP.logging.inspect
   agent.run
   Rack::Handler::Thin.run Opscode::Agent::HttpService.new(agent), :Port => Opscode::Agent::Config[:http_port]
 end

@@ -25,6 +25,7 @@ module Opscode
         :name => 'opscode-agent',
         :http_port => 8000,
         :daemonize => false,
+        :log_amqp => false,
         :nanite_host => 'localhost',
         :nanite_user => 'nanite',
         :nanite_pass => 'testing',

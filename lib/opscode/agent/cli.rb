@@ -58,6 +58,9 @@ module Opscode
         opts.on("-d", "--daemonize", "Run the agent daemonized") do
           @config[:daemonize] = true
         end
+        opts.on("--log-amqp", "Enable amqp protocol logging") do
+          @config[:log_amqp] = true
+        end
         opts.on_tail("-h", "--help", "Show this message") do
           puts opts
           exit 0
