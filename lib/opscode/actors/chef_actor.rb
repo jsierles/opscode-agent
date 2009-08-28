@@ -24,6 +24,19 @@ require 'stringio'
 require 'opscode/agent/config'
 require 'tempfile'
 
+# Quick and dirty hack
+# Files in /sys have wrong size and File.read hangs inside EM.run { }
+class File
+  class<<self
+    alias_method :read_unlocked, :read
+    def read(*args)
+      Thread.exclusive {
+        read_unlocked(*args)
+      }
+    end
+  end
+end
+
 module Opscode
   class ChefActor
     include Nanite::Actor
