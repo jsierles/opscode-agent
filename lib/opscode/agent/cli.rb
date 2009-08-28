@@ -34,6 +34,9 @@ module Opscode
         opts.on("-c CONFIG", "--config CONFIG", "The agent config file to use") do |c|
           @config[:config_file] = c
         end
+        opts.on("-C CHEF_CONFIG", "--chef-config CHEF_CONFIG", "Chef client config file to use") do |c|
+          Chef::Config.from_file(c)
+        end
         opts.on("-l LEVEL", "--loglevel LEVEL", "Set the log level (debug, info, warn, error, fatal)") do |l|
           @config[:log_level] = l
         end

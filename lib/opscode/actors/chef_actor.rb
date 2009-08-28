@@ -26,14 +26,15 @@ require 'tempfile'
 
 # Quick and dirty hack
 # Files in /sys have wrong size and File.read hangs inside EM.run { }
+module FileExclusiveRead
+  def read(*args)
+    Thread.exclusive { super }
+  end
+end
+
 class File
   class<<self
-    alias_method :read_unlocked, :read
-    def read(*args)
-      Thread.exclusive {
-        read_unlocked(*args)
-      }
-    end
+    include FileExclusiveRead
   end
 end
 
