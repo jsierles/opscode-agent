@@ -34,5 +34,7 @@ EM.run do
   agent = Opscode::Agent::CLI.new
   AMQP.logging = agent.config[:log_amqp]
   agent.run
-  Rack::Handler::Thin.run Opscode::Agent::HttpService.new(agent), :Port => Opscode::Agent::Config[:http_port]
+  unless agent.config[:disable_http]
+    Rack::Handler::Thin.run Opscode::Agent::HttpService.new(agent), :Port => Opscode::Agent::Config[:http_port]
+  end
 end

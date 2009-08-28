@@ -26,6 +26,7 @@ module Opscode
         :http_port => 8000,
         :daemonize => false,
         :log_amqp => false,
+        :disable_http => false,
         :nanite_host => 'localhost',
         :nanite_user => 'nanite',
         :nanite_pass => 'testing',

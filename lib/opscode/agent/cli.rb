@@ -61,6 +61,9 @@ module Opscode
         opts.on("--log-amqp", "Enable amqp protocol logging") do
           @config[:log_amqp] = true
         end
+        opts.on("--disable-http", "Run only nanite agent without http daemon") do
+          @config[:disable_http] = true
+        end
         opts.on_tail("-h", "--help", "Show this message") do
           puts opts
           exit 0
@@ -77,7 +80,9 @@ module Opscode
           :vhost => Opscode::Agent::Config[:nanite_vhost],
           :daemonize => Opscode::Agent::Config[:daemonize],
           :identity => Opscode::Agent::Config[:identity],
-          :name => Opscode::Agent::Config[:name]
+          :name => Opscode::Agent::Config[:name],
+          :log_amqp => Opscode::Agent::Config[:log_amqp],
+          :disable_http => Opscode::Agent::Config[:disable_http]
         }
         $0 = "#{@config[:name]} #{argv.join(' ')}\0"
         opts = OptionParser.new do |opts|          
