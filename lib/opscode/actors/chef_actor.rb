@@ -26,13 +26,12 @@ require 'tempfile'
 
 # Quick and dirty hack
 # Files in /sys have wrong size and File.read hangs inside EM.run { }
-module FileExclusiveRead
-  def read(*args)
-    Thread.exclusive { super }
-  end
-end
-
 class File
+  module FileExclusiveRead
+    def read(*args)
+      Thread.exclusive { super }
+    end
+  end
   class<<self
     include FileExclusiveRead
   end
@@ -133,6 +132,9 @@ module Opscode
 
     def converge(payload, &mapper)
       log_to_string(mapper) do
+        if payload && payload[:log_level]
+          Chef::Log.level(payload[:log_level].to_sym)  rescue ArgumentError
+        end
         client = Chef::Client.new
         client.run
       end
