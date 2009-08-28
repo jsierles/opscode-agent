@@ -85,7 +85,8 @@ module Opscode
           :identity => Opscode::Agent::Config[:identity],
           :name => Opscode::Agent::Config[:name],
           :log_amqp => Opscode::Agent::Config[:log_amqp],
-          :disable_http => Opscode::Agent::Config[:disable_http]
+          :disable_http => Opscode::Agent::Config[:disable_http],
+          :single_threaded => true
         }
         $0 = "#{@config[:name]} #{argv.join(' ')}\0"
         opts = OptionParser.new do |opts|          
@@ -94,12 +95,10 @@ module Opscode
       end
     
       def run
-        EM.run do
-          agent = Nanite::Agent.start(@config)
-          agent.register(Opscode::OhaiActor.new, 'state')
-          agent.register(Opscode::ChefActor.new, 'control')
-          agent.send :advertise_services
-        end
+        agent = Nanite::Agent.start(@config)
+        agent.register(Opscode::OhaiActor.new, 'state')
+        agent.register(Opscode::ChefActor.new, 'control')
+        agent.send :advertise_services
       end
     end
   end

@@ -42,15 +42,13 @@ module Opscode
     include Nanite::Actor
 
     class TeeStringLogger
-      def initialize(intermediate_result_proc = nil)
+      def initialize
         @buffer = StringIO.new
-        @intermediate_result_proc = intermediate_result_proc
       end
 
       def write(message)
         STDOUT.write(message)
         @buffer.write(message)
-        @intermediate_result_proc.call(message) if @intermediate_result_proc
       end
 
       def close
@@ -63,8 +61,8 @@ module Opscode
     end
     
     expose :collection, :resource, :recipe, :converge
-    def log_to_string(intermediate_result_proc = nil, &block)
-      output = TeeStringLogger.new(intermediate_result_proc)
+    def log_to_string(&block)
+      output = TeeStringLogger.new
       Chef::Log.logger = nil
       Chef::Log.init(output)
       block.call
@@ -72,9 +70,9 @@ module Opscode
       output.results
     end
 
-    def collection(payload, &mapper)
+    def collection(payload)
       node = Chef::Client.new.build_node
-      lts = log_to_string(mapper) do
+      lts = log_to_string do
         resource_collection = payload 
         resource_collection.each { |r| r.instance_variable_set(:@node, node) }
         runner = Chef::Runner.new(node, resource_collection)
@@ -83,12 +81,12 @@ module Opscode
       { :log => lts, :resource => payload[:resource] } 
     end
 
-    def resource(payload, &mapper)
+    def resource(payload)
       Chef::Log.level(:debug)
       client = Chef::Client.new
       client.build_node
       payload[:resource].instance_variable_set(:@node, client.node)
-      lts = log_to_string(mapper) do
+      lts = log_to_string do
         payload[:resource].run_action(payload[:resource].action)
       end
       { :log => lts, :resource => payload[:resource] } 
@@ -110,14 +108,14 @@ module Opscode
       { :resources => ra }
     end
 
-    def recipe(payload, &mapper)
+    def recipe(payload)
       tf = Tempfile.new("test-recipe")
       tf.write(payload)
       tf.close
       Chef::Log.level(:info)
       collection = nil 
       
-      lts = log_to_string(mapper) do
+      lts = log_to_string do
         client = Chef::Client.new
         client.build_node
         client.node
@@ -130,8 +128,8 @@ module Opscode
       { :log => lts, :resources => collection }
     end
 
-    def converge(payload, &mapper)
-      log_to_string(mapper) do
+    def converge(payload)
+      log_to_string do
         if payload && payload[:log_level]
           Chef::Log.level(payload[:log_level].to_sym)  rescue ArgumentError
         end
